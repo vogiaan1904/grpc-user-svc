@@ -12,6 +12,11 @@ export enum Gender {
   OTHER = 'OTHER',
 }
 
+export enum Role {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
+
 @Schema({
   timestamps: {
     createdAt: 'created_at',
@@ -45,6 +50,9 @@ export class User extends BaseEntity {
 
   @Prop({ required: true, enum: Gender })
   gender: Gender;
+
+  @Prop({ default: Role.USER, enum: Role })
+  role: Role;
 
   @Prop({
     default:

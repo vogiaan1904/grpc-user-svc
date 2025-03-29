@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { UpdateUserRequest } from '../user.pb';
 
-export class UpdateUserProfileDto {
+export class UpdateUserProfileDto implements UpdateUserRequest {
   constructor(partial: Partial<UpdateUserProfileDto>) {
     Object.assign(this, partial);
   }

@@ -6,22 +6,20 @@ import {
   RpcExceptionFilter,
   UseFilters,
 } from '@nestjs/common';
-import { UserService } from './user.service';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
+import { throwError } from 'rxjs';
+import { CreateUserRequestDto, UpdateUserProfileDto } from './dto';
+import { DeleteUserRequestDto } from './dto/delete-user.request.dto';
+import { FindOneRequestDto } from './dto/find-one-user.request.dto';
 import {
   CreateUserResponse,
   FindAllRequest,
   FindAllResponse,
-  FindOneRequest,
   FindOneResponse,
   UpdateUserResponse,
   USER_SERVICE_NAME,
-  UserServiceControllerMethods,
 } from './user.pb';
-import { FindOneRequestDto } from './dto/find-one-user.request.dto';
-import { Observable, of, throwError, firstValueFrom } from 'rxjs';
-import { CreateUserRequestDto, UpdateUserProfileDto } from './dto';
-import { DeleteUserRequestDto } from './dto/delete-user.request.dto';
+import { UserService } from './user.service';
 
 @Catch(RpcException)
 export class GrpcExceptionFilter implements RpcExceptionFilter<RpcException> {

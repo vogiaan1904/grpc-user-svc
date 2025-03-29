@@ -1,8 +1,9 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Gender } from '../../../entities/user.entity';
+import { Gender, Role } from '../../../entities/user.entity';
 import { Transform } from 'class-transformer';
+import { CreateUserRequest } from '../user.pb';
 
-export class CreateUserRequestDto {
+export class CreateUserRequestDto implements CreateUserRequest {
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -24,4 +25,10 @@ export class CreateUserRequestDto {
   @IsString()
   @Transform(({ value }) => value.toUpperCase())
   gender: Gender;
+
+  @IsNotEmpty()
+  @IsEnum(Role)
+  @IsString()
+  @Transform(({ value }) => value.toUpperCase())
+  role: Role;
 }

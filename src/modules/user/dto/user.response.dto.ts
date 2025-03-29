@@ -1,6 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Address } from '../../../entities/address.entity';
-import { Gender, User } from '../../../entities';
+import { Gender, Role, User } from '../../../entities';
 
 export class UserResponseDto implements User {
   constructor(partial: Partial<UserResponseDto>) {
@@ -27,6 +27,9 @@ export class UserResponseDto implements User {
 
   @Expose()
   gender: Gender;
+
+  @Expose()
+  role: Role;
 
   @Expose()
   avatar: string;

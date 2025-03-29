@@ -28,7 +28,7 @@ export class UserService {
       const user: User = await this.repository.findById(id);
       if (!user) {
         return {
-          status: HttpStatus.NOT_FOUND,
+          status: HttpStatus.BAD_GATEWAY,
           error: ['User not found'],
           data: null,
         };
@@ -49,7 +49,7 @@ export class UserService {
       const user: User = await this.repository.findOne({ email });
       if (!user) {
         return {
-          status: HttpStatus.NOT_FOUND,
+          status: HttpStatus.BAD_REQUEST,
           error: ['User not found'],
           data: null,
         };

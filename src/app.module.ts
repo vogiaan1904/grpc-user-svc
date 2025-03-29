@@ -33,7 +33,6 @@ import * as Joi from 'joi';
       cache: true,
       expandVariables: true,
     }),
-    UserModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
@@ -44,6 +43,7 @@ import * as Joi from 'joi';
       },
       inject: [ConfigService],
     }),
+    UserModule,
     AddressModule,
   ],
   controllers: [AppController],

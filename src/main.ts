@@ -1,11 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { INestMicroservice, ValidationPipe } from '@nestjs/common';
-import { Transport } from '@nestjs/microservices';
+import {
+  HttpStatus,
+  INestMicroservice,
+  ValidationPipe,
+  Logger,
+} from '@nestjs/common';
+import { RpcException, Transport } from '@nestjs/microservices';
 import { protobufPackage } from './modules/user/user.pb';
 import { join } from 'path';
+import { AllExceptionsFilter } from './common/filters/grpc-exception.filter';
+import { status as GrpcStatus } from '@grpc/grpc-js';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app: INestMicroservice = await NestFactory.createMicroservice(
     AppModule,
     {
@@ -18,7 +26,21 @@ async function bootstrap() {
     },
   );
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      exceptionFactory: (errors) => {
+        logger.error('Validation failed:', errors);
+        return new RpcException({
+          code: GrpcStatus.INVALID_ARGUMENT,
+          message: 'Validation failed',
+          details: errors,
+        });
+      },
+    }),
+  );
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen();
 }
