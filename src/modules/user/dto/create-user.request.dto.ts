@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Gender, Role } from '../../../entities/user.entity';
 import { Transform } from 'class-transformer';
-import { CreateUserRequest } from '../user.pb';
+import { CreateUserRequest } from 'src/protos/user.pb';
 
 export class CreateUserRequestDto implements CreateUserRequest {
   @IsEmail()

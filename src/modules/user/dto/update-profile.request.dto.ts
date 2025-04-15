@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { UpdateUserRequest } from '../user.pb';
+import { UpdateUserRequest } from '../../../protos/user.pb';
 
 export class UpdateUserProfileDto implements UpdateUserRequest {
   constructor(partial: Partial<UpdateUserProfileDto>) {

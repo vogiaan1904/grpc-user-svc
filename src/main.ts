@@ -1,16 +1,17 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import {
-  HttpStatus,
-  INestMicroservice,
-  ValidationPipe,
-  Logger,
-} from '@nestjs/common';
-import { RpcException, Transport } from '@nestjs/microservices';
-import { protobufPackage } from './modules/user/user.pb';
-import { join } from 'path';
-import { AllExceptionsFilter } from './common/filters/grpc-exception.filter';
 import { status as GrpcStatus } from '@grpc/grpc-js';
+import {
+  BadRequestException,
+  INestMicroservice,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
+import { join } from 'path';
+import { throwError } from 'rxjs';
+import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/grpc-exception.filter';
+import { USER_PACKAGE_NAME } from './protos/user.pb';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -20,7 +21,7 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         url: '0.0.0.0:50052',
-        package: protobufPackage,
+        package: USER_PACKAGE_NAME,
         protoPath: join('node_modules/grpc-nest-proto/proto/user.proto'),
       },
     },
@@ -31,8 +32,7 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       exceptionFactory: (errors) => {
-        logger.error('Validation failed:', errors);
-        return new RpcException({
+        throw new BadRequestException({
           code: GrpcStatus.INVALID_ARGUMENT,
           message: 'Validation failed',
           details: errors,

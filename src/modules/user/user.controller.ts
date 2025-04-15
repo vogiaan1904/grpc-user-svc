@@ -13,12 +13,11 @@ import { DeleteUserRequestDto } from './dto/delete-user.request.dto';
 import { FindOneRequestDto } from './dto/find-one-user.request.dto';
 import {
   CreateUserResponse,
-  FindAllRequest,
   FindAllResponse,
   FindOneResponse,
   UpdateUserResponse,
   USER_SERVICE_NAME,
-} from './user.pb';
+} from '../../protos/user.pb';
 import { UserService } from './user.service';
 
 @Catch(RpcException)
@@ -52,8 +51,8 @@ export class UserController {
   }
 
   @GrpcMethod(USER_SERVICE_NAME, 'FindAll')
-  private async findAll(payload: FindAllRequest): Promise<FindAllResponse> {
-    return this.service.findAll(payload);
+  private async findAll(): Promise<FindAllResponse> {
+    return this.service.findAll();
   }
 
   @GrpcMethod(USER_SERVICE_NAME, 'UpdateUser')
