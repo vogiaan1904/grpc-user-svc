@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AddressService } from './modules/address/address.service';
 import { AddressModule } from './modules/address/address.module';
 import * as Joi from 'joi';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { GlobalExceptionFilter } from './common/filters/grpc-exception.filter';
 
 @Module({
   imports: [
@@ -47,6 +49,13 @@ import * as Joi from 'joi';
     AddressModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AddressService],
+  providers: [
+    AppService,
+    AddressService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

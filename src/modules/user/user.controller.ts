@@ -8,17 +8,17 @@ import {
 } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { throwError } from 'rxjs';
-import { CreateUserRequestDto, UpdateUserProfileDto } from './dto';
-import { DeleteUserRequestDto } from './dto/delete-user.request.dto';
-import { FindOneRequestDto } from './dto/find-one-user.request.dto';
 import {
   CreateUserResponse,
   FindAllResponse,
   FindOneResponse,
-  UpdateUserResponse,
+  UpdateUserRequest,
   USER_SERVICE_NAME,
 } from '../../protos/user.pb';
+import { CreateUserRequestDto, UpdateUserProfileDto } from './dto';
+import { FindOneRequestDto } from './dto/find-one-user.request.dto';
 import { UserService } from './user.service';
+import { DeleteUserRequestDto } from './dto/delete-user.request.dto';
 
 @Catch(RpcException)
 export class GrpcExceptionFilter implements RpcExceptionFilter<RpcException> {
@@ -56,16 +56,13 @@ export class UserController {
   }
 
   @GrpcMethod(USER_SERVICE_NAME, 'UpdateUser')
-  private async updateUser(
-    payload: UpdateUserProfileDto,
-  ): Promise<UpdateUserResponse> {
+  private async updateUser(payload: UpdateUserRequest): Promise<void> {
+    console.log('UpdateUser payload: ', payload);
     return this.service.updateProfile(payload);
   }
 
   @GrpcMethod(USER_SERVICE_NAME, 'DeleteUser')
-  private async deleteUser(
-    payload: DeleteUserRequestDto,
-  ): Promise<UpdateUserResponse> {
+  private async deleteUser(payload: DeleteUserRequestDto): Promise<void> {
     return this.service.delete(payload);
   }
 }

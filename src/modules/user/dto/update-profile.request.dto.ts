@@ -5,6 +5,7 @@ export class UpdateUserProfileDto implements UpdateUserRequest {
   constructor(partial: Partial<UpdateUserProfileDto>) {
     Object.assign(this, partial);
   }
+
   @IsNotEmpty()
   @IsString()
   id: string;

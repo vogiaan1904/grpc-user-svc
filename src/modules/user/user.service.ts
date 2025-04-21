@@ -1,19 +1,17 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { User } from '../../entities/user.entity';
-import { UpdateUserProfileDto } from './dto';
-import { CreateUserRequestDto } from './dto/create-user.request.dto';
-import { UsersRepository } from './repositories/base/user.repo';
 import {
   CreateUserResponse,
   DeleteUserRequest,
-  DeleteUserResponse,
-  ErrorCode,
   FindAllResponse,
   FindOneRequest,
   FindOneResponse,
-  UpdateUserResponse,
 } from '../../protos/user.pb';
-import { UserErrors } from 'src/common/constants/errors.constant';
+import { CreateUserRequestDto } from './dto/create-user.request.dto';
+import { UsersRepository } from './repositories/base/user.repo';
+import { RpcNotFoundException } from 'src/common/exceptions/rpc.exception';
+import { UpdateUserProfileDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -21,63 +19,51 @@ export class UserService {
 
   async create(dto: CreateUserRequestDto): Promise<CreateUserResponse> {
     const user: User = await this.repository.create(dto);
-    return { id: user.id, error: UserErrors.OK };
+    return { user };
   }
 
   async findById({ id }: FindOneRequest): Promise<FindOneResponse> {
     const user: User = await this.repository.findById(id);
     if (!user) {
-      return {
-        error: UserErrors.USER_NOT_FOUND,
-        data: null,
-      };
+      return { user: null };
     }
-    return { error: UserErrors.OK, data: user };
+
+    return { user };
   }
 
   async findByEmail({ email }: FindOneRequest): Promise<FindOneResponse> {
     const user: User = await this.repository.findOne({ email });
     if (!user) {
-      return {
-        error: UserErrors.USER_NOT_FOUND,
-        data: null,
-      };
+      return { user: null };
     }
-    return { error: UserErrors.OK, data: user };
+
+    return { user };
   }
 
   async findAll(): Promise<FindAllResponse> {
     const response = await this.repository.findAll({});
     return {
-      error: UserErrors.OK,
-      data: response.items,
+      users: response.items,
     };
   }
 
-  async updateProfile({
-    id,
-    ...data
-  }: UpdateUserProfileDto): Promise<UpdateUserResponse> {
+  async updateProfile({ id, ...data }: UpdateUserProfileDto): Promise<void> {
+    console.log('data: ', data);
     const user: User = await this.repository.findById(id);
-
     if (!user) {
-      return {
-        error: UserErrors.USER_NOT_FOUND,
-      };
+      throw new RpcNotFoundException('User not found');
     }
-    await this.repository.update(id, data);
-    return { error: UserErrors.OK };
+
+    const updatedUser = await this.repository.update(id, data);
+    console.log('Updated user:', updatedUser);
   }
 
-  async delete({ id }: DeleteUserRequest): Promise<DeleteUserResponse> {
+  async delete({ id }: DeleteUserRequest): Promise<void> {
     const user: User = await this.repository.findById(id);
-
     if (!user) {
-      return {
-        error: UserErrors.USER_NOT_FOUND,
-      };
+      throw new RpcNotFoundException('User not found');
     }
+
     await this.repository.softDelete(id);
-    return { error: UserErrors.OK };
   }
 }

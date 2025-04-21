@@ -10,8 +10,9 @@ import { Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { throwError } from 'rxjs';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filters/grpc-exception.filter';
 import { USER_PACKAGE_NAME } from './protos/user.pb';
+import { GlobalExceptionFilter } from './common/filters/grpc-exception.filter';
+import { RpcInvalidArgumentException } from './common/exceptions/rpc.exception';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -32,16 +33,11 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       exceptionFactory: (errors) => {
-        throw new BadRequestException({
-          code: GrpcStatus.INVALID_ARGUMENT,
-          message: 'Validation failed',
-          details: errors,
-        });
+        throw new RpcInvalidArgumentException('Validation failed');
       },
     }),
   );
-  app.useGlobalFilters(new AllExceptionsFilter());
-
+  app.useGlobalFilters(new GlobalExceptionFilter());
   await app.listen();
 }
 bootstrap();
