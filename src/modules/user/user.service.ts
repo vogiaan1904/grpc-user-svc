@@ -10,8 +10,9 @@ import {
 } from '../../protos/user.pb';
 import { CreateUserRequestDto } from './dto/create-user.request.dto';
 import { UsersRepository } from './repositories/base/user.repo';
-import { RpcNotFoundException } from 'src/common/exceptions/rpc.exception';
+import { RpcInvalidArgumentException, RpcNotFoundException } from 'src/common/exceptions/rpc.exception';
 import { UpdateUserProfileDto } from './dto';
+import { UserErrors } from 'src/constants/error.constant';
 
 @Injectable()
 export class UserService {
@@ -25,7 +26,7 @@ export class UserService {
   async findById({ id }: FindOneRequest): Promise<FindOneResponse> {
     const user: User = await this.repository.findById(id);
     if (!user) {
-      return { user: null };
+      throw new RpcNotFoundException(UserErrors.USER_NOT_FOUND);
     }
 
     return { user };
@@ -34,7 +35,7 @@ export class UserService {
   async findByEmail({ email }: FindOneRequest): Promise<FindOneResponse> {
     const user: User = await this.repository.findOne({ email });
     if (!user) {
-      return { user: null };
+      throw new RpcNotFoundException(UserErrors.USER_NOT_FOUND);
     }
 
     return { user };
@@ -51,7 +52,7 @@ export class UserService {
     console.log('data: ', data);
     const user: User = await this.repository.findById(id);
     if (!user) {
-      throw new RpcNotFoundException('User not found');
+      throw new RpcNotFoundException(UserErrors.USER_NOT_FOUND);
     }
 
     const updatedUser = await this.repository.update(id, data);
@@ -61,7 +62,7 @@ export class UserService {
   async delete({ id }: DeleteUserRequest): Promise<void> {
     const user: User = await this.repository.findById(id);
     if (!user) {
-      throw new RpcNotFoundException('User not found');
+      throw new RpcNotFoundException(UserErrors.USER_NOT_FOUND);
     }
 
     await this.repository.softDelete(id);
